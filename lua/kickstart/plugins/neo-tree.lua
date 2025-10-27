@@ -15,6 +15,7 @@ return {
   },
   opts = {
     filesystem = {
+      hijack_netrw_behavior = 'disabled', -- Let Oil handle directory buffers
       window = {
         mappings = {
           ['\\'] = 'close_window',

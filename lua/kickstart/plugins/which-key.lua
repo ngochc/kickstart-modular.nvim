@@ -59,9 +59,17 @@ return {
 
       -- Document existing key chains
       spec = {
-        { '<leader>F', group = '[F]ind' },
+        { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { 'j', group = 'Jump (mini.jump2d)', mode = 'n' },
+        { 'jj', desc = 'Jump to character', mode = 'n' },
+        { 'jl', desc = 'Jump to line', mode = 'n' },
+        { 'jw', desc = 'Jump to word', mode = 'n' },
+        { 'f', desc = 'Jump forward to char (mini.jump)', mode = { 'n', 'x', 'o' } },
+        { 'F', desc = 'Jump backward to char (mini.jump)', mode = { 'n', 'x', 'o' } },
+        { 't', desc = 'Jump forward until char (mini.jump)', mode = { 'n', 'x', 'o' } },
+        { 'T', desc = 'Jump backward until char (mini.jump)', mode = { 'n', 'x', 'o' } },
       },
     },
   },

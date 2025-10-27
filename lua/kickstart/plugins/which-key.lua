@@ -59,9 +59,27 @@ return {
 
       -- Document existing key chains
       spec = {
-        { '<leader>s', group = '[S]earch' },
+        { '<leader>f', group = '[F]ind' },
         { '<leader>t', group = '[T]oggle' },
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>S', group = '[S]ession' },
+        { '<leader>b', group = '[B]uffer' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        -- Code group (LSP + formatting)
+        { '<leader>cf', desc = '[C]ode [F]ormat buffer', mode = 'n' },
+        { '<leader>cf', desc = '[C]ode [F]ormat selection', mode = 'x' },
+        { '<leader>tf', desc = '[T]oggle [F]ormat on save', mode = 'n' },
+        { '<leader>ca', desc = '[C]ode [A]ction', mode = { 'n', 'x' } },
+        { '<leader>rn', desc = '[R]e[n]ame symbol', mode = 'n' },
+
+        -- Non-leader LSP navigations (documented for discoverability)
+        { 'gd', desc = 'LSP: Goto Definition', mode = 'n' },
+        { 'gD', desc = 'LSP: Goto Declaration', mode = 'n' },
+        { 'gi', desc = 'LSP: Goto Implementation', mode = 'n' },
+        { 'gt', desc = 'LSP: Goto Type Definition', mode = 'n' },
+        { 'gr', desc = 'LSP: Find References', mode = 'n' },
+        { 'K', desc = 'LSP: Hover', mode = 'n' },
+        { '<C-k>', desc = 'LSP: Signature Help', mode = 'n' },
         { 'j', group = 'Jump (mini.jump2d)', mode = 'n' },
         { 'jj', desc = 'Jump to character', mode = 'n' },
         { 'jl', desc = 'Jump to line', mode = 'n' },

@@ -81,7 +81,7 @@ return {
     local dap = require 'dap'
     local dapui = require 'dapui'
 
-    require('mason-nvim-dap').setup {
+  require('mason-nvim-dap').setup {
       -- Makes a best effort to setup the various debuggers with
       -- reasonable debug configurations
       automatic_installation = true,
@@ -94,7 +94,10 @@ return {
       -- online, please don't ask me how to install them :)
       ensure_installed = {
         -- Update this to ensure that you have the debuggers for the langs you want
-        'delve',
+        'delve', -- Go
+        'debugpy', -- Python
+        'javadbg', -- Java Debug (used with jdtls)
+        'java-test', -- Java Test runner
       },
     }
 

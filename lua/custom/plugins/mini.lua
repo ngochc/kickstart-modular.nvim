@@ -2,6 +2,24 @@ return {
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
+      require('mini.basics').setup {
+        options = {
+          basic = true,
+          extra_ui = true,
+          win_borders = 'single',
+        },
+        mappings = {
+          basic = true,
+          option_toggle_prefix = '<leader>',
+          windows = true,
+          move_with_alt = true,
+        },
+        autocommands = {
+          basic = true,
+          relnum_in_visual_mode = true,
+        },
+      }
+
       -- Better Around/Inside textobjects
       --
       -- Examples:
@@ -156,8 +174,59 @@ return {
         end,
       })
 
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      -- Additional mini.nvim modules
+      -- Comments, motions around brackets, move lines/blocks, operators, align, split/join, trailspace
+      require('mini.comment').setup()
+      require('mini.bracketed').setup()
+      require('mini.move').setup()
+      require('mini.operators').setup()
+      require('mini.align').setup { mappings = { start = 'ga', start_with_preview = 'gA' } }
+      require('mini.splitjoin').setup()
+      require('mini.trailspace').setup()
+
+      -- Highlight hex colors and common TODO-like keywords
+      require('mini.hipatterns').setup {
+        highlighters = {
+          hex_color = require('mini.hipatterns').gen_highlighter.hex_color(),
+          todo = { pattern = '%f[%w]()TODO()%f[%W]', group = 'Todo' },
+          fixme = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'WarningMsg' },
+          hack = { pattern = '%f[%w]()HACK()%f[%W]', group = 'WarningMsg' },
+          note = { pattern = '%f[%w]()NOTE()%f[%W]', group = 'DiagnosticHint' },
+        },
+      }
+
+      -- Sessions management
+      require('mini.sessions').setup {
+        autoread = false,
+        autowrite = false,
+        directory = vim.fn.stdpath('data') .. '/sessions',
+      }
+      vim.keymap.set('n', '<leader>Sw', function()
+        require('mini.sessions').write()
+      end, { desc = '[S]ession [W]rite' })
+      vim.keymap.set('n', '<leader>Sr', function()
+        require('mini.sessions').read()
+      end, { desc = '[S]ession [R]ead' })
+      vim.keymap.set('n', '<leader>Sd', function()
+        require('mini.sessions').delete()
+      end, { desc = '[S]ession [D]elete' })
+      vim.keymap.set('n', '<leader>SS', function()
+        require('mini.sessions').select()
+      end, { desc = '[S]ession [S]elect' })
+
+      -- Buffer remove helpers
+      local bufremove = require 'mini.bufremove'
+      vim.keymap.set('n', '<leader>bd', function()
+        bufremove.delete(0, false)
+      end, { desc = '[B]uffer [D]elete' })
+      vim.keymap.set('n', '<leader>bD', function()
+        bufremove.delete(0, true)
+      end, { desc = '[B]uffer [D]elete (force)' })
+
+      -- Trim trailing whitespace on demand
+      vim.keymap.set('n', '<leader>ct', function()
+        require('mini.trailspace').trim()
+      end, { desc = '[C]lean [T]railing space' })
     end,
   },
 }

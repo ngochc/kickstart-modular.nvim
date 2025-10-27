@@ -29,8 +29,6 @@ require('lazy').setup({
 
   require 'kickstart.plugins.telescope',
 
-  require 'kickstart.plugins.conform',
-
   require 'kickstart.plugins.blink-cmp',
 
   -- Theme is now in custom/plugins

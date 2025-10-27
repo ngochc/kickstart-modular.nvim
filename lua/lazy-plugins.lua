@@ -29,17 +29,13 @@ require('lazy').setup({
 
   require 'kickstart.plugins.telescope',
 
-  require 'kickstart.plugins.lspconfig',
-
   require 'kickstart.plugins.conform',
 
   require 'kickstart.plugins.blink-cmp',
 
-  require 'kickstart.plugins.tokyonight',
+  -- Theme is now in custom/plugins
 
   require 'kickstart.plugins.todo-comments',
-
-  require 'kickstart.plugins.mini',
 
   require 'kickstart.plugins.treesitter',
 

@@ -88,11 +88,22 @@ return {
         -- - Function: should return one of these three categories.
         -- - Array: elements of these three types (i.e. item, array, function).
         items = {
-          starter.sections.telescope(),
-          { name = 'Projects', action = 'Telescope projects', section = 'Telescope' },
-          starter.sections.recent_files(5, false, false),
-          starter.sections.recent_files(5, true, false),
-          starter.sections.sessions(5, true),
+          -- Telescope section
+          { name = 'Find Files                    ', action = 'Telescope find_files', section = '🔭 Telescope' },
+          { name = 'Live Grep                     ', action = 'Telescope live_grep', section = '🔭 Telescope' },
+          { name = 'Recent Files                  ', action = 'Telescope oldfiles', section = '🔭 Telescope' },
+          { name = 'Projects                      ', action = 'Telescope projects', section = '🔭 Telescope' },
+          
+          -- Quick Actions section
+          { name = 'File Browser (Oil)            ', action = 'Oil --float', section = '⚡ Quick Actions' },
+          { name = 'File Tree (Neo-tree)          ', action = 'Neotree reveal', section = '⚡ Quick Actions' },
+          { name = 'New File                      ', action = 'enew', section = '⚡ Quick Actions' },
+          { name = 'Config                        ', action = 'edit $MYVIMRC | cd %:p:h', section = '⚡ Quick Actions' },
+          
+          -- Sessions
+          starter.sections.sessions(8, true),
+          
+          -- Built-in actions
           starter.sections.builtin_actions(),
         },
         -- Header to be displayed before items. Converted to single string via `tostring` (use `\n` to display several lines).
@@ -102,17 +113,48 @@ return {
           local part_id = math.floor((hour + 4) / 8) + 1
           local day_part = ({ 'evening', 'morning', 'afternoon', 'evening' })[part_id]
           local username = vim.loop.os_get_passwd()['username'] or 'USERNAME'
-          return ('Good %s, %s'):format(day_part, username)
+          
+          -- ASCII art header
+          local header_art = [[
+    ███╗   ██╗██╗██████╗  ██████╗ 
+    ████╗  ██║██║██╔══██╗██╔═══██╗
+    ██╔██╗ ██║██║██████╔╝██║   ██║
+    ██║╚██╗██║██║██╔══██╗██║   ██║
+    ██║ ╚████║██║██████╔╝╚██████╔╝
+    ╚═╝  ╚═══╝╚═╝╚═════╝  ╚═════╝ 
+]]
+          return header_art .. '\n' .. ('Good %s, %s'):format(day_part, username)
         end,
         -- Footer to be displayed after items. Converted to single string via `tostring` (use `\n` to display several lines).
-        footer = '',
+        footer = function()
+          local stats = require('lazy').stats()
+          local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+          return string.format('⚡ Loaded %d/%d plugins in %.2fms', stats.loaded, stats.count, ms)
+        end,
         -- Array of functions to be applied consecutively to initial content.
         content_hooks = {
           starter.gen_hook.adding_bullet(),
-          starter.gen_hook.indexing('all', { 'Builtin actions' }),
+          -- Removed indexing to hide numbers
           starter.gen_hook.padding(3, 2),
+          starter.gen_hook.aligning('center', 'center'),
         },
       }
+
+      -- Auto-open starter when last buffer is closed
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'BDeletePost*',
+        callback = function(event)
+          local fallback_name = vim.api.nvim_buf_get_name(event.buf)
+          local fallback_ft = vim.api.nvim_buf_get_option(event.buf, 'filetype')
+          local fallback_on_empty = fallback_name == '' and fallback_ft == ''
+
+          if fallback_on_empty then
+            vim.schedule(function()
+              vim.cmd 'Starter'
+            end)
+          end
+        end,
+      })
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim

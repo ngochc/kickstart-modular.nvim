@@ -72,28 +72,46 @@ return {
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
 
-          -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
+          -- ====== More Friendly LSP Keymaps ======
+          
+          -- Go to definition - Most commonly used, single key!
+          map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          
+          -- Go to declaration (header files, interfaces)
+          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+          
+          -- Go to implementation (actual code of interface/abstract)
+          map('gi', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+          
+          -- Go to type definition
+          map('gt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
+          
+          -- Find references - where is this used?
+          map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+          
+          -- Hover documentation - Show info about symbol
+          map('K', vim.lsp.buf.hover, 'Hover Documentation')
+          
+          -- Signature help - Show function parameters while typing
+          map('<C-k>', vim.lsp.buf.signature_help, 'Signature Help')
+          
+          -- Rename symbol
+          map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+          
+          -- Code actions (quick fixes, imports, refactorings)
+          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
+          
+          -- Format code
+          map('<leader>cf', function()
+            vim.lsp.buf.format { async = true }
+          end, '[C]ode [F]ormat')
+          
+          -- Keep old keymaps for compatibility
           map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
           map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-
-          -- Find references for the word under your cursor.
           map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-
-          -- Jump to the implementation of the word under your cursor.
-          --  Useful when your language has ways of declaring types without an actual implementation.
           map('gri', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-
-          -- Jump to the definition of the word under your cursor.
-          --  This is where a variable was first declared, or where a function is defined, etc.
-          --  To jump back, press <C-t>.
           map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-
-          -- WARN: This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header.
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
           -- Fuzzy find all the symbols in your current document.
@@ -167,8 +185,11 @@ return {
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
         severity_sort = true,
-        float = { border = 'rounded', source = 'if_many' },
-        underline = { severity = vim.diagnostic.severity.ERROR },
+        float = { 
+          border = 'rounded', 
+          source = 'if_many',
+        },
+        underline = true, -- Underline errors/warnings
         signs = vim.g.have_nerd_font and {
           text = {
             [vim.diagnostic.severity.ERROR] = '󰅚 ',
@@ -177,19 +198,15 @@ return {
             [vim.diagnostic.severity.HINT] = '󰌶 ',
           },
         } or {},
+        -- Show virtual text but only for errors to reduce clutter
         virtual_text = {
+          severity = { min = vim.diagnostic.severity.ERROR },
           source = 'if_many',
-          spacing = 2,
-          format = function(diagnostic)
-            local diagnostic_message = {
-              [vim.diagnostic.severity.ERROR] = diagnostic.message,
-              [vim.diagnostic.severity.WARN] = diagnostic.message,
-              [vim.diagnostic.severity.INFO] = diagnostic.message,
-              [vim.diagnostic.severity.HINT] = diagnostic.message,
-            }
-            return diagnostic_message[diagnostic.severity]
-          end,
+          spacing = 4,
+          prefix = '■',
         },
+        -- Use this instead if you want NO inline text:
+        -- virtual_text = false,
       }
 
       -- LSP servers and clients are able to communicate to each other what features they support.
@@ -209,10 +226,33 @@ return {
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- gopls = {},
+        gopls = {},
         pyright = {},
-        jdtls = {},
-        -- rust_analyzer = {},
+        jdtls = {
+          -- Force jdtls to always use Java 21
+          cmd = {
+            vim.fn.expand '~/.asdf/installs/java/adoptopenjdk-21.0.5+11.0.LTS/bin/java',
+            '-Declipse.application=org.eclipse.jdt.ls.core.id1',
+            '-Dosgi.bundles.defaultStartLevel=4',
+            '-Declipse.product=org.eclipse.jdt.ls.core.product',
+            '-Dlog.protocol=true',
+            '-Dlog.level=ALL',
+            '-Xmx1g',
+            '--add-modules=ALL-SYSTEM',
+            '--add-opens',
+            'java.base/java.util=ALL-UNNAMED',
+            '--add-opens',
+            'java.base/java.lang=ALL-UNNAMED',
+            '-jar',
+            vim.fn.expand '~/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar',
+            '-configuration',
+            vim.fn.expand '~/.local/share/nvim/mason/packages/jdtls/config_mac',
+            '-data',
+            vim.fn.expand '~/.cache/jdtls-workspace',
+          },
+        },
+        ts_ls = {}, -- TypeScript/JavaScript
+        jsonls = {}, -- JSON
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
